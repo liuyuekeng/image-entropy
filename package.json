@@ -1,5 +1,5 @@
 {
-  "name": "image-entropy",
+  "name": "img-entropy",
   "version": "1.0.0",
   "description": "get image entrogy",
   "main": "index.js",
