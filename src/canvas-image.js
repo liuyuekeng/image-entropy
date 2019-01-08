@@ -1,6 +1,14 @@
 const {createCanvas, loadImage} = require('canvas');
 const {PixelArray} =require('./pixel-array');
 
+function formula(distribution, total) {
+    return Object.keys(distribution).reduce((r, v) => {
+        let p = distribution[v] / total;
+        r += p * -Math.log(p, 2);
+        return r;
+    }, 0); 
+}
+
 class CanvasImage {
     constructor(imageSrc) {
         this.imageSrc = imageSrc;
@@ -17,25 +25,34 @@ class CanvasImage {
             self.ctx = self.canvas.getContext('2d');
             self.ctx.drawImage(self.image, 0, 0, width, height);
             self.imageData = self.ctx.getImageData(0, 0, width, height);
-            self.pixelArray = new PixelArray(self.imageData);
+            self.pixelArray = new PixelArray(self.imageData, width, height);
         });
     }
     getEntropy(colorGradation = 256) {
         let scale = 256 / colorGradation;
         let distribution = {};
-        let pixelCount = this.pixelArray.value.length;
+        let pixelCount = this.pixelArray.length;
         this.pixelArray.value.forEach(v => {
             let hashKey = v.chunk.slice(0, 3).map(v => Math.floor(v / scale)).toString();
             distribution[hashKey] = distribution[hashKey] ? ++distribution[hashKey] : 1;
-        })
-        var res = Object.keys(distribution).reduce((r, v) => {
-            let p = distribution[v] / pixelCount;
-            r += p * -Math.log(p, 2);
-            return r;
-        }, 0);
-        return res;
+        });
+        return formula(distribution, pixelCount);
     }
-
+    get2DEntropy(colorGradation = 256) {
+        let scale = 256 / colorGradation;
+        let distribution = {};
+        let pixelCount = this.pixelArray.length;
+        let array = this.pixelArray.value;
+        array.forEach((v, k) => {
+            let current = this.pixelArray.getPixelByIndex(k);
+            let neighbor = this.pixelArray.getNeighborPixelByIndex(k);
+            let avg = this.pixelArray.getAvgPixel(neighbor);
+            let diff = current.diff(avg);
+            let hashKey = diff.slice(0, 3).map(v => Math.floor(v / scale)).toString();
+            distribution[hashKey] = distribution[hashKey] ? ++ distribution[hashKey] : 1;
+        });
+        return formula(distribution, pixelCount);
+    }
 }
 
 module.exports = {

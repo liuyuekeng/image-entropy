@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const {getEntropy} = require('../index');
+const imgEntropy = require('../index');
 
 const imgDirPath = path.resolve(__dirname, './imgs');
 fs.readdir(imgDirPath, (err, files) => {
@@ -10,13 +10,8 @@ fs.readdir(imgDirPath, (err, files) => {
   let p = [];
   files.forEach(fileName => {
     let filePath = path.resolve(imgDirPath, fileName);
-    p.push(getEntropy(filePath));
-    /*
-    let canvasImage = new CanvasImage(filePath);
-    canvasImage.init().then(() => {
-      console.log(fileName + '::', canvasImage.getEntropy());
-    });
-    */
+    var img = imgEntropy(filePath);
+    p.push(Promise.all([img.getEntropy(), img.get2DEntropy()]))
   });
   Promise.all(p).then(res => {
     res.forEach((v, k) => {
