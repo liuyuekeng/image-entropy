@@ -5,18 +5,28 @@ function formula(distribution, total, normalize) {
     let distributionSize = 0;
     let res = Object.keys(distribution).reduce((r, v) => {
         let p = distribution[v] / total;
-        r += p * -Math.log(p, 2);
+        r += p * -Math.log(p);
         distributionSize ++;
         return r;
     }, 0); 
+    res = res / Math.LN2;
     if (normalize) {
-        let k = Math.log(distributionSize);
+        let k = Math.log(distributionSize) / Math.LN2;
         res = k ? res / k : 0;
         if (res > 1) {
             res = 1;
         }
     }
     return res;
+}
+
+function getScale(colorGradation) {
+    let n = Math.log(colorGradation) / Math.LN2;
+    if (n % 1 === 0 && n < 9 && n > 0) {
+        return 256 / colorGradation;
+    } else {
+        return 1;
+    }
 }
 
 class CanvasImage {
@@ -43,7 +53,7 @@ class CanvasImage {
             colorGradation = 256,
             normalize = false
         } = opt;
-        let scale = 256 % colorGradation ? 1 : 256 / colorGradation;
+        let scale = getScale(colorGradation);
         let distribution = {};
         let pixelCount = this.pixelArray.length;
         this.pixelArray.value.forEach(v => {
@@ -57,7 +67,7 @@ class CanvasImage {
             colorGradation = 256,
             normalize = false
         } = opt;
-        let scale = 256 % colorGradation ? 1 : 256 / colorGradation;
+        let scale = getScale(colorGradation);
         let distribution = {};
         let pixelCount = this.pixelArray.length;
         let array = this.pixelArray.value;
