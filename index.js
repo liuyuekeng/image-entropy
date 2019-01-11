@@ -7,11 +7,11 @@ function imgEntropy (src) {
   function runHoldingList() {
     holdingList.forEach(v => v());
   }
-  function getEntropy(colorGradation = 256) {
-    return invokWhilLoaded('getEntropy', colorGradation);
+  function getEntropy(opt) {
+    return invokWhilLoaded('getEntropy', opt);
   }
-  function get2DEntropy(colorGradation = 256) {
-    return invokWhilLoaded('get2DEntropy', colorGradation);
+  function get2DEntropy(opt) {
+    return invokWhilLoaded('get2DEntropy', opt);
   }
   function invokWhilLoaded(method, ...args) {
     if (loaded) {

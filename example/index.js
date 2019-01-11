@@ -11,7 +11,7 @@ fs.readdir(imgDirPath, (err, files) => {
   files.forEach(fileName => {
     let filePath = path.resolve(imgDirPath, fileName);
     var img = imgEntropy(filePath);
-    p.push(Promise.all([img.getEntropy(), img.get2DEntropy()]))
+    p.push(Promise.all([img.getEntropy({normalize: true}), img.get2DEntropy({normalize: true})]))
   });
   Promise.all(p).then(res => {
     res.forEach((v, k) => {

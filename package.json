@@ -1,6 +1,6 @@
 {
   "name": "img-entropy",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "get image entrogy",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,10 @@
   },
   "keywords": [
     "image",
-    "entropy"
+    "entropy",
+    "2D-entropy",
+    "jpeg",
+    "png"
   ],
   "author": "liuyuekeng",
   "license": "ISC",

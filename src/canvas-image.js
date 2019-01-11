@@ -1,12 +1,22 @@
 const {createCanvas, loadImage} = require('canvas');
 const {PixelArray} =require('./pixel-array');
 
-function formula(distribution, total) {
-    return Object.keys(distribution).reduce((r, v) => {
+function formula(distribution, total, normalize) {
+    let distributionSize = 0;
+    let res = Object.keys(distribution).reduce((r, v) => {
         let p = distribution[v] / total;
         r += p * -Math.log(p, 2);
+        distributionSize ++;
         return r;
     }, 0); 
+    if (normalize) {
+        let k = Math.log(distributionSize);
+        res = k ? res / k : 0;
+        if (res > 1) {
+            res = 1;
+        }
+    }
+    return res;
 }
 
 class CanvasImage {
@@ -28,18 +38,26 @@ class CanvasImage {
             self.pixelArray = new PixelArray(self.imageData, width, height);
         });
     }
-    getEntropy(colorGradation = 256) {
-        let scale = 256 / colorGradation;
+    getEntropy(opt = {}) {
+        let {
+            colorGradation = 256,
+            normalize = false
+        } = opt;
+        let scale = 256 % colorGradation ? 1 : 256 / colorGradation;
         let distribution = {};
         let pixelCount = this.pixelArray.length;
         this.pixelArray.value.forEach(v => {
             let hashKey = v.chunk.slice(0, 3).map(v => Math.floor(v / scale)).toString();
             distribution[hashKey] = distribution[hashKey] ? ++distribution[hashKey] : 1;
         });
-        return formula(distribution, pixelCount);
+        return formula(distribution, pixelCount, normalize);
     }
-    get2DEntropy(colorGradation = 256) {
-        let scale = 256 / colorGradation;
+    get2DEntropy(opt = {}) {
+        let {
+            colorGradation = 256,
+            normalize = false
+        } = opt;
+        let scale = 256 % colorGradation ? 1 : 256 / colorGradation;
         let distribution = {};
         let pixelCount = this.pixelArray.length;
         let array = this.pixelArray.value;
@@ -51,7 +69,7 @@ class CanvasImage {
             let hashKey = diff.slice(0, 3).map(v => Math.floor(v / scale)).toString();
             distribution[hashKey] = distribution[hashKey] ? ++ distribution[hashKey] : 1;
         });
-        return formula(distribution, pixelCount);
+        return formula(distribution, pixelCount, normalize);
     }
 }
 
