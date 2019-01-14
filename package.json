@@ -1,6 +1,6 @@
 {
   "name": "img-entropy",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "get image entrogy",
   "main": "index.js",
   "scripts": {

@@ -5,13 +5,12 @@ function formula(distribution, total, normalize) {
     let distributionSize = 0;
     let res = Object.keys(distribution).reduce((r, v) => {
         let p = distribution[v] / total;
-        r += p * -Math.log(p);
+        r += p * -Math.log2(p);
         distributionSize ++;
         return r;
     }, 0); 
-    res = res / Math.LN2;
     if (normalize) {
-        let k = Math.log(distributionSize) / Math.LN2;
+        let k = Math.log2(distributionSize);
         res = k ? res / k : 0;
         if (res > 1) {
             res = 1;
@@ -21,7 +20,7 @@ function formula(distribution, total, normalize) {
 }
 
 function getScale(colorGradation) {
-    let n = Math.log(colorGradation) / Math.LN2;
+    let n = Math.log2(colorGradation);
     if (n % 1 === 0 && n < 9 && n > 0) {
         return 256 / colorGradation;
     } else {
@@ -57,7 +56,7 @@ class CanvasImage {
         let distribution = {};
         let pixelCount = this.pixelArray.length;
         this.pixelArray.value.forEach(v => {
-            let hashKey = v.chunk.slice(0, 3).map(v => Math.floor(v / scale)).toString();
+            let hashKey = v.chunk.slice(0, 3).map(v => Math.trunc(v / scale)).toString();
             distribution[hashKey] = distribution[hashKey] ? ++distribution[hashKey] : 1;
         });
         return formula(distribution, pixelCount, normalize);
@@ -76,7 +75,7 @@ class CanvasImage {
             let neighbor = this.pixelArray.getNeighborPixelByIndex(k);
             let avg = this.pixelArray.getAvgPixel(neighbor);
             let diff = current.diff(avg);
-            let hashKey = diff.slice(0, 3).map(v => Math.floor(v / scale)).toString();
+            let hashKey = diff.slice(0, 3).map(v => Math.trunc(v / scale)).toString();
             distribution[hashKey] = distribution[hashKey] ? ++ distribution[hashKey] : 1;
         });
         return formula(distribution, pixelCount, normalize);
